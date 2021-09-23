@@ -42,7 +42,9 @@ func WithAuthorizers(authorizers map[string]rbac.Authorizer, permission rbac.Per
 				return
 			}
 
-			if statusCode, ok := a.Authorize(subject, groups, permission, resource, tenant, token); !ok {
+			tenantID, _ := authentication.GetTenantID(r.Context())
+
+			if statusCode, ok := a.Authorize(subject, groups, permission, resource, tenant, tenantID, token); !ok {
 				w.WriteHeader(statusCode)
 
 				return

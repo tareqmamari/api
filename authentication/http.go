@@ -72,7 +72,10 @@ func WithTenantHeader(header string, tenantIDs map[string]string) Middleware {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			tenant := chi.URLParam(r, "tenant")
-			r.Header.Add(header, tenantIDs[tenant])
+			// tenantID will be used by loki, loki then splits it to get the chunk parts
+			// based on slashes: https://git.io/JzR97
+			tenantID := strings.ReplaceAll(tenantIDs[tenant], "/", "")
+			r.Header.Add(header, tenantID)
 			next.ServeHTTP(w, r)
 		})
 	}
